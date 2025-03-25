@@ -5,3 +5,4 @@ streamlit-folium
 shapely
 joblib
 scikit-learn
+prophet
