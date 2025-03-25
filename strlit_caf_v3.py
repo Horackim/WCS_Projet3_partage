@@ -10,7 +10,7 @@ import os
 # Configuration de la page pour occuper toute la largeur centrale
 st.set_page_config(page_title="Prédiction des dépenses CAF département", layout="wide")
 
-chemin = "datasets/datasets_destination/"
+chemin = "datasets_destination/"
 
 # Chargement des datasets
 @st.cache_data
