@@ -4,3 +4,4 @@ folium
 streamlit-folium
 shapely
 joblib
+scikit-learn
