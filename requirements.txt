@@ -6,3 +6,4 @@ shapely
 joblib
 scikit-learn
 prophet
+cmdstanpy==1.1.0
