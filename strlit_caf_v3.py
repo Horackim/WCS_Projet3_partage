@@ -6,11 +6,12 @@ from shapely.geometry import shape
 import json
 import joblib
 import os
+import prophet
 
 # Configuration de la page pour occuper toute la largeur centrale
 st.set_page_config(page_title="Prédiction des dépenses CAF département", layout="wide")
 
-chemin = "datasets_destination/"
+chemin = "datasets/datasets_destination/"
 
 # Chargement des datasets
 @st.cache_data
@@ -66,6 +67,14 @@ elif selected_year == 2026:
 else:
     month_options = list(range(1, 13))
 selected_month = st.sidebar.selectbox("Mois", month_options)
+target_options = {
+    "Toutes prestations (NDUR)": "indmtt_ndur",
+    "Prestations petites enfances (NDURPAJE)": "indmtt_ndurpaje",
+    "Prestation prime de naissance (PN)": "indmtt_pn",
+    "Prestations enfances (NDUREJ)": "indmtt_ndurej"
+}
+selected_target_label = st.sidebar.selectbox("Type de dépense à prédire", list(target_options.keys()))
+selected_target = target_options[selected_target_label]
 
 # Titre principal
 st.title("Prédiction des dépenses CAF département")
@@ -101,7 +110,7 @@ folium.GeoJson(
     geojson,
     name="Départements",
     style_function=lambda x: {"fillColor": "yellow" if x["properties"]["code"] == dep_code else "#eeeeee",
-                              "color": "black", "weight": 1},
+                            "color": "black", "weight": 1},
     tooltip=folium.GeoJsonTooltip(fields=["nom"], aliases=["Département:"])
 ).add_to(m)
 
@@ -174,7 +183,7 @@ with col_pred:
     else:
         # Définir le chemin du modèle en fonction du département sélectionné
         dep_str = str(dep_code).zfill(2)
-        model_path = os.path.join("ml_prophet", f"prophet_model_{dep_str}.pkl")
+        model_path = os.path.join("ml_prophet", selected_target, f"prophet_model_{dep_str}.pkl")
         model = joblib.load(model_path)
 
         # Création de la date pour la prédiction à partir de l'année et du mois sélectionnés
@@ -192,4 +201,6 @@ with col_pred:
         forecast = model.predict(input_data)
         prediction = forecast["yhat"].values[0]
         
-        st.success(f"Prédiction pour {selected_dep} ({selected_month}/{selected_year}) : {prediction:,.2f} €")
+        st.success(f"📊 Prédiction ({selected_target_label}) pour {selected_dep} — {selected_month:02d}/{selected_year} : **{prediction:,.2f} €**"
+)
+
